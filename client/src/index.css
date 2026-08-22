@@ -83,6 +83,12 @@ h1,h2 { font-family:"Noto Serif SC",serif; }
 .galaxy-transition { z-index:4; background:linear-gradient(180deg,rgba(2,8,22,.42),rgba(2,8,22,.12) 58%,rgba(2,8,22,.44)); pointer-events:none; }
 .network-field[data-sequence="evolution"] .network-evolution { opacity:1; transform:none; }
 
+/* 第三幕双成片串联：开场重构成片结束后，仅以不透明度切换到三态演变成片。 */
+.network-transition { position:absolute; z-index:3; inset:0; opacity:1; transition:opacity 100ms linear; background:#020712; }
+.network-field[data-sequence="intro"] .network-evolution { opacity:0; pointer-events:none; }
+.network-field[data-sequence="evolution"] .network-transition { opacity:0; pointer-events:none; }
+.galaxy-transition { display:none !important; }
+
 /* 审阅收束：断层标记、旧结构残影和稀缺的共识青蓝，让五幕保持同一条剥离轨迹。 */
 .brand-lockup { position:relative; }
 .brand-lockup::before { content:""; position:absolute; left:2px; width:34px; height:34px; border:1px solid rgba(88,216,255,.82); border-radius:50%; box-shadow:inset 0 0 0 5px #07111e,inset 0 0 0 6px rgba(88,216,255,.46),0 0 13px rgba(88,216,255,.18); clip-path:polygon(0 0,100% 0,100% 44%,57% 47%,43% 58%,0 55%); transform:rotate(-22deg); pointer-events:none; }

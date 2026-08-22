@@ -26,6 +26,7 @@ const TERMINAL_TEXTURE = "/manus-storage/cross-era-damaged-terminal-texture_720e
 const EARTH_SCENE = "/manus-storage/cross-era-decentralized-earth_10b19834.jpg";
 const EARTH_DAY = "/manus-storage/earth-day-lowres_ebf2eeb9.jpg";
 const ACT3_EVOLUTION_VIDEO = "/manus-storage/act3-evolution-final-v3_19c729d4.mp4";
+const ACT3_TRANSITION_VIDEO = "/manus-storage/particle-transition-final_42cef813.mp4";
 
 const AUDIO_SOURCES = {
   act1ButtonWarning: "/manus-storage/act1-button-warning_0fdb3330.mp3",
@@ -148,6 +149,7 @@ export default function Home() {
   const [loaded, setLoaded] = useState(false);
 
   const audioRefs = useRef<Partial<Record<AudioCue, HTMLAudioElement>>>({});
+  const act3TransitionVideoRef = useRef<HTMLVideoElement | null>(null);
   const act3VideoRef = useRef<HTMLVideoElement | null>(null);
   const act3BoostTimer = useRef<number | null>(null);
   const idlePlayed = useRef(false);
@@ -188,10 +190,11 @@ export default function Home() {
   useEffect(() => {
     if (currentAct !== 3) return;
     setAct3Sequence("galaxy"); setEvolution(0); setMotionBoost(0); voicedStage.current = -1;
-    const start = window.setTimeout(() => setAct3Sequence("evolution"), 2100);
-    const video = act3VideoRef.current;
-    if (video) { video.currentTime = 0; video.playbackRate = 1; void video.play().catch(() => undefined); }
-    return () => { window.clearTimeout(start); if (act3BoostTimer.current !== null) window.clearTimeout(act3BoostTimer.current); };
+    const transitionVideo = act3TransitionVideoRef.current;
+    const evolutionVideo = act3VideoRef.current;
+    if (evolutionVideo) { evolutionVideo.pause(); evolutionVideo.currentTime = 0; evolutionVideo.playbackRate = 1; }
+    if (transitionVideo) { transitionVideo.currentTime = 0; transitionVideo.playbackRate = 1; void transitionVideo.play().catch(() => undefined); }
+    return () => { if (act3BoostTimer.current !== null) window.clearTimeout(act3BoostTimer.current); };
   }, [currentAct]);
 
   const stageIndex = evolution < 34 ? 0 : evolution < 67 ? 1 : 2;
@@ -268,6 +271,11 @@ export default function Home() {
     if (act3BoostTimer.current !== null) window.clearTimeout(act3BoostTimer.current);
     act3BoostTimer.current = window.setTimeout(() => { if (act3VideoRef.current) act3VideoRef.current.playbackRate = 1; setMotionBoost(0); }, 760);
   };
+  const startEvolutionVideo = () => {
+    const evolutionVideo = act3VideoRef.current;
+    setAct3Sequence("evolution");
+    if (evolutionVideo) { evolutionVideo.currentTime = 0; evolutionVideo.playbackRate = 1; void evolutionVideo.play().catch(() => undefined); }
+  };
   const handlePointerMove = (x: number, width: number) => {
     if (dragStart.current === null) return;
     const delta = x - dragStart.current;
@@ -306,7 +314,7 @@ export default function Home() {
       </section>}
 
       {currentAct === 3 && <section className="act-panel act-three" aria-labelledby="act-three-title" style={{ "--particle-storm": `url(${PARTICLE_STORM})` } as CSSProperties}>
-        <div className="act-content network-layout"><div className="network-heading"><ActCaption act={3} /><div><p className="eyebrow">既可独立存在 · 也能临时聚合成簇</p><h1 id="act-three-title">每个粒子都是<br />一个微型节点</h1></div></div><div className="network-field" data-sequence={act3Sequence} onPointerDown={event => { if (act3Sequence === "evolution") { event.currentTarget.setPointerCapture(event.pointerId); dragStart.current = event.clientX; } }} onPointerMove={event => handlePointerMove(event.clientX, event.currentTarget.clientWidth)} onPointerUp={() => { dragStart.current = null; }} onPointerCancel={() => { dragStart.current = null; }} onWheel={event => { if (event.deltaX > 0) { event.preventDefault(); boostEvolution(event.deltaX / 4); } }} onKeyDown={event => { if (event.key === "ArrowRight") { event.preventDefault(); boostEvolution(12); } }} role="slider" tabIndex={0} aria-label="网络演变进度，向右滑动或按右方向键可以加速" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(evolution)}><div className="galaxy-transition"><p>正在重构信任网络 · 请稍候</p></div><div className="network-evolution"><video ref={act3VideoRef} className="act3-evolution-video" src={ACT3_EVOLUTION_VIDEO} autoPlay muted playsInline preload="auto" onTimeUpdate={event => { const { currentTime, duration } = event.currentTarget; if (Number.isFinite(duration) && duration > 0) setEvolution((currentTime / duration) * 100); }} onEnded={() => goToAct(4)} aria-label="粒子从枢纽单点演变为多极竞争和网络共识的动画" /></div>{act3Sequence === "evolution" && <><div className="network-state"><span>{stageLabels[stageIndex]}</span><i><b style={{ width: `${Math.max(10, evolution)}%` }} /></i></div><p className="swipe-hint">向右滑动可加速演变</p><div className="network-symbols"><span>₿</span><span>010011</span><span>⌘</span></div></>}</div>{act3Sequence === "evolution" && <div className="network-progress"><p>{stageLabels[stageIndex]}</p><strong>{["所有路径，指向同一个中心。", "权力开始分散，连接仍受限。", "每一个节点，都是新世界的入口。"][stageIndex]}</strong><div>{stageLabels.map((label, index) => <span className={index <= stageIndex ? "is-reached" : ""} key={label}>{label}</span>)}</div></div>}</div>
+        <div className="act-content network-layout"><div className="network-heading"><ActCaption act={3} /><div><p className="eyebrow">既可独立存在 · 也能临时聚合成簇</p><h1 id="act-three-title">每个粒子都是<br />一个微型节点</h1></div></div><div className="network-field" data-sequence={act3Sequence} onPointerDown={event => { if (act3Sequence === "evolution") { event.currentTarget.setPointerCapture(event.pointerId); dragStart.current = event.clientX; } }} onPointerMove={event => handlePointerMove(event.clientX, event.currentTarget.clientWidth)} onPointerUp={() => { dragStart.current = null; }} onPointerCancel={() => { dragStart.current = null; }} onWheel={event => { if (event.deltaX > 0) { event.preventDefault(); boostEvolution(event.deltaX / 4); } }} onKeyDown={event => { if (event.key === "ArrowRight") { event.preventDefault(); boostEvolution(12); } }} role="slider" tabIndex={0} aria-label="第三幕视频序列；第二段可向右滑动或按右方向键加速" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(evolution)}><div className="network-transition"><video ref={act3TransitionVideoRef} className="act3-evolution-video" src={ACT3_TRANSITION_VIDEO} autoPlay muted playsInline preload="auto" onEnded={startEvolutionVideo} aria-label="正在重构信任网络的粒子过渡动画" /></div><div className="galaxy-transition"><p>正在重构信任网络 · 请稍候</p></div><div className="network-evolution"><video ref={act3VideoRef} className="act3-evolution-video" src={ACT3_EVOLUTION_VIDEO} muted playsInline preload="auto" onTimeUpdate={event => { const { currentTime, duration } = event.currentTarget; if (Number.isFinite(duration) && duration > 0) setEvolution((currentTime / duration) * 100); }} onEnded={() => goToAct(4)} aria-label="粒子从枢纽单点演变为多极竞争和网络共识的动画" /></div>{act3Sequence === "evolution" && <><div className="network-state"><span>{stageLabels[stageIndex]}</span><i><b style={{ width: `${Math.max(10, evolution)}%` }} /></i></div><p className="swipe-hint">向右滑动可加速演变</p><div className="network-symbols"><span>₿</span><span>010011</span><span>⌘</span></div></>}</div>{act3Sequence === "evolution" && <div className="network-progress"><p>{stageLabels[stageIndex]}</p><strong>{["所有路径，指向同一个中心。", "权力开始分散，连接仍受限。", "每一个节点，都是新世界的入口。"][stageIndex]}</strong><div>{stageLabels.map((label, index) => <span className={index <= stageIndex ? "is-reached" : ""} key={label}>{label}</span>)}</div></div>}</div>
       </section>}
 
       {currentAct === 4 && <section className={`act-panel act-four is-${act4Stage} ${waterExit ? "is-watering-out" : ""}`} aria-labelledby="act-four-title">
