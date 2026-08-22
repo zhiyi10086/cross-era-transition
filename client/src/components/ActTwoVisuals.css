@@ -1,0 +1,49 @@
+.fragment-shards i {
+  left: var(--x);
+  top: var(--y);
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+}
+
+.act2-visual-art {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: .54;
+  mix-blend-mode: screen;
+  filter: saturate(.86) contrast(1.08);
+  animation: act2VisualBreath 5s ease-in-out infinite alternate;
+}
+
+.act2-credit-visual .act2-visual-art { object-position: 72% center; opacity: .4; }
+.act2-fragment-visual .act2-visual-art { opacity: .62; filter: saturate(.74) contrast(1.15); }
+
+@keyframes act2VisualBreath {
+  0% { transform: scale(1); }
+  100% { transform: scale(1.035); }
+}
+
+.act2-fragment-visual .legacy-window {
+  animation: legacyWindowBreak 3.2s cubic-bezier(.23, 1, .32, 1) infinite alternate;
+}
+
+@keyframes legacyWindowBreak {
+  0%, 16% { opacity: 1; transform: scale(1); filter: none; }
+  100% { opacity: .12; transform: scale(.91); filter: blur(5px); }
+}
+
+@media (max-width: 640px) {
+  .act2-credit-visual { min-height: 330px; }
+  .act2-credit-visual .credit-balance { top: 67px; left: 17px; width: 48%; }
+  .act2-credit-visual .credit-balance strong { font-size: 26px; letter-spacing: -.12em; }
+  .act2-credit-visual .credit-balance span { font-size: 10px; }
+  .act2-credit-visual .credit-ledger { top: 137px; right: 17px; width: 40%; min-width: 0; gap: 6px; }
+  .act2-credit-visual .credit-ledger span { height: 9px; }
+  .act2-credit-visual .credit-metrics { bottom: 40px; }
+  .act2-credit-visual .credit-metrics div { padding: 7px; }
+  .act2-credit-visual .credit-metrics b { font-size: 12px; }
+  .act2-credit-visual p { display: none; }
+}
