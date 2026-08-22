@@ -97,6 +97,10 @@ h1,h2 { font-family:"Noto Serif SC",serif; }
 .old-bank-fault-overlay span,.old-bank-fault-overlay i { font:9px "IBM Plex Mono",monospace; letter-spacing:.12em; }.old-bank-fault-overlay strong { color:#ff777f; font:600 21px "Noto Serif SC",serif; letter-spacing:.05em; }.old-bank-fault-overlay i { color:#ff9299; font-style:normal; white-space:nowrap; animation:data-drain 2.2s linear infinite; }
 @media (max-width:900px) { .old-bank-interface { aspect-ratio:2048 / 1150; min-height:0; } }
 
+/* 第二幕指定成片：以16:9碎裂视频取代AI生成玻璃碎片，并由结束帧驱动节点入网。 */
+.video-shatter-scene { min-height:0; aspect-ratio:16 / 9; margin-top:24px; background:#020712; }
+.act2-shatter-video { display:block; width:100%; height:100%; object-fit:contain; background:#020712; }
+
 /* 审阅收束：断层标记、旧结构残影和稀缺的共识青蓝，让五幕保持同一条剥离轨迹。 */
 .brand-lockup { position:relative; }
 .brand-lockup::before { content:""; position:absolute; left:2px; width:34px; height:34px; border:1px solid rgba(88,216,255,.82); border-radius:50%; box-shadow:inset 0 0 0 5px #07111e,inset 0 0 0 6px rgba(88,216,255,.46),0 0 13px rgba(88,216,255,.18); clip-path:polygon(0 0,100% 0,100% 44%,57% 47%,43% 58%,0 55%); transform:rotate(-22deg); pointer-events:none; }

@@ -26,6 +26,7 @@ const TERMINAL_TEXTURE = "/manus-storage/cross-era-damaged-terminal-texture_720e
 const EARTH_SCENE = "/manus-storage/cross-era-decentralized-earth_10b19834.jpg";
 const EARTH_DAY = "/manus-storage/earth-day-lowres_ebf2eeb9.jpg";
 const ACT1_LEGACY_BANK_IMAGE = "/manus-storage/act1-legacy-wealth-platform_f06fb989.jpg";
+const ACT2_LEGACY_SHATTER_VIDEO = "/manus-storage/act2-legacy-bank-shatter_8b931b8c.mp4";
 const ACT3_EVOLUTION_VIDEO = "/manus-storage/act3-evolution-final-v3_19c729d4.mp4";
 const ACT3_TRANSITION_VIDEO = "/manus-storage/particle-transition-final_42cef813.mp4";
 
@@ -85,11 +86,9 @@ function OldBankInterface({ failed }: { failed: boolean }) {
   </div>;
 }
 
-function LegacyShatter() {
-  return <section id="scene-old-bank-shatter" className="shatter-scene" data-anchor="scene-old-bank-shatter" aria-label="旧银行界面碎裂动画">
-    <div className="shatter-window"><div className="shatter-top"><span>CENTRAL LEDGER</span><b>CONNECTION LOST</b></div><strong>¥ 86,420.00</strong><i /><i /><i /></div>
-    <div className="shatter-pieces" aria-hidden="true">{Array.from({ length: 22 }, (_, index) => <i key={index} style={{ "--piece": index } as CSSProperties} />)}</div>
-    <p><span>LEGACY INTERFACE</span>GLASS FRACTURING</p>
+function LegacyShatterVideo({ soundEnabled, onComplete }: { soundEnabled: boolean; onComplete: () => void }) {
+  return <section id="scene-old-bank-shatter" className="shatter-scene video-shatter-scene" data-anchor="scene-old-bank-shatter" aria-label="旧银行界面从边缘碎裂成深空背景的动画">
+    <video className="act2-shatter-video" src={ACT2_LEGACY_SHATTER_VIDEO} autoPlay muted playsInline preload="auto" onEnded={onComplete} onError={() => window.setTimeout(onComplete, 10500)} />
   </section>;
 }
 
@@ -248,7 +247,6 @@ export default function Home() {
     usedCodes.current.add(code); setIdentityCode(code); setIdentityError(""); setAct2Mode("dna"); playCue("act2Submit", 0.9);
     window.setTimeout(() => { setAct2Mode("recovery"); playCue("act2Mapped", 0.8); }, 3400);
     window.setTimeout(() => setAct2Mode("fragment"), 6100);
-    window.setTimeout(() => setAct2Mode("node"), 8700);
   };
 
   const boostEvolution = (delta: number) => {
@@ -298,7 +296,7 @@ export default function Home() {
           {act2Mode === "identity" && <div className="identity-panel"><div><span className="eyebrow"><KeyRound size={14} />IDENTITY CONFIRMATION</span><h2>请确认您的<br />数字身份</h2><p>姓名与随机四位数将构成一次性的识别码。</p><p className="identity-note">此身份用于映射旧世界资产记录 · 无需任何中心化机构认证。</p></div><div className="identity-form"><label htmlFor="identity-name">姓名 + 随机四位数</label><Input id="identity-name" value={identityName} onChange={event => setIdentityName(event.target.value)} placeholder="输入姓名" /><p>{identityError}</p><Button onClick={generateIdentity}><Sparkles size={16} />生成并确认密钥</Button></div></div>}
           {act2Mode === "dna" && <div className="act2-sequence-panel"><span className="eyebrow"><KeyRound size={14} />KEY ASSEMBLY</span><h2>密钥字符正在组合并固定</h2><strong className="mono">{identityCode}</strong><DnaKeyVisual /></div>}
           {act2Mode === "recovery" && <div className="act2-sequence-panel recovery-panel"><span className="eyebrow"><Sparkles size={14} />NETWORK MAPPING</span><div><h2>您的资产已通过去中心化网络映射完成</h2><p>这些资产不存储在任何单一机构中 · 它们存在于网络的每一个节点上。</p><b>总资产：86,420.00 信用单位</b></div><DigitalAssetBoard /></div>}
-          {act2Mode === "fragment" && <div className="act2-sequence-panel fragment-panel"><span className="eyebrow"><AlertTriangle size={14} />LEGACY DETACHMENT</span><h2>旧银行界面正在碎裂</h2><LegacyShatter /></div>}
+          {act2Mode === "fragment" && <div className="act2-sequence-panel fragment-panel"><span className="eyebrow"><AlertTriangle size={14} />LEGACY DETACHMENT</span><h2>旧银行界面正在碎裂</h2><LegacyShatterVideo soundEnabled={soundEnabled} onComplete={() => setAct2Mode("node")} /></div>}
           {act2Mode === "node" && <div className="node-panel"><Network size={36} /><span className="eyebrow">NODE ENTRY</span><h2>映射已完成。<br />你的节点，正在加入网络。</h2><Button onClick={() => goToAct(3)}><Network size={16} />启用自己的节点</Button></div>}
         </div>
       </section>}
