@@ -4,14 +4,15 @@
  */
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type RefObject } from "react";
 import {
-  AlertTriangle, ArrowRight, Check, ChevronRight, Clock3, KeyRound, Network,
-  Play, RefreshCw, Send, Settings2, ShieldAlert, Sparkles, UserRound, Volume2,
+  AlertTriangle, ArrowRight, ChevronRight, Clock3, KeyRound, Network,
+  Settings2, ShieldAlert, Sparkles, UserRound, Volume2,
   VolumeX, WalletCards, WifiOff,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { DigitalAssetBoard, DnaKeyVisual } from "@/components/ActTwoVisuals";
+import { OrbEarthExperience } from "@/components/OrbEarthExperience";
 
 type Act = 1 | 2 | 3 | 4 | 5;
 type Act2Mode = "choice" | "waiting" | "identity" | "dna" | "recovery" | "fragment" | "node";
@@ -23,8 +24,6 @@ type LearningPlan = { duration: string; stages: string[]; tip: string };
 const BRAND_MARK = "/manus-storage/cross-era-fold-mark_05281b0a.png";
 const PARTICLE_STORM = "/manus-storage/cross-era-particle-storm_a15e9244.jpg";
 const TERMINAL_TEXTURE = "/manus-storage/cross-era-damaged-terminal-texture_720e35ed.jpg";
-const EARTH_SCENE = "/manus-storage/cross-era-decentralized-earth_10b19834.jpg";
-const EARTH_DAY = "/manus-storage/earth-day-lowres_ebf2eeb9.jpg";
 const ACT1_LEGACY_BANK_IMAGE = "/manus-storage/act1-legacy-wealth-platform_f06fb989.jpg";
 const ACT2_LEGACY_SHATTER_VIDEO = "/manus-storage/act2-legacy-bank-shatter_8b931b8c.mp4";
 const ACT3_EVOLUTION_VIDEO = "/manus-storage/act3-evolution-final-v3_19c729d4.mp4";
@@ -101,14 +100,6 @@ function LegacyTraining() {
   </div>;
 }
 
-function EarthNetwork({ screensaver }: { screensaver: boolean }) {
-  return <div className={`earth-network ${screensaver ? "is-pulling-back" : ""}`} aria-hidden="true">
-    <div className="earth-globe" style={{ backgroundImage: `url(${EARTH_DAY})` }} />
-    <div className="earth-node-sphere">{Array.from({ length: 64 }, (_, index) => <i key={index} style={{ "--i": index } as CSSProperties} />)}</div>
-    <div className="earth-ring ring-a" /><div className="earth-ring ring-b" /><div className="earth-ring ring-c" />
-  </div>;
-}
-
 function FutureTrace() {
   return <aside className="future-trace" aria-hidden="true"><span>CENTRAL ENGLISH / ARCHIVE EXPIRED</span><i /><i /><i /><b>ACCESS<br />NO LONGER<br />REQUIRED</b></aside>;
 }
@@ -133,9 +124,6 @@ export default function Home() {
   const [goal, setGoal] = useState("");
   const [plan, setPlan] = useState<LearningPlan | null>(null);
   const [waterExit, setWaterExit] = useState(false);
-  const [wish, setWish] = useState("");
-  const [wishSubmitted, setWishSubmitted] = useState(false);
-  const [screensaver, setScreensaver] = useState(false);
   const [loaded, setLoaded] = useState(false);
 
   const audioRefs = useRef<Partial<Record<AudioCue, HTMLAudioElement>>>({});
@@ -222,7 +210,6 @@ export default function Home() {
 
   useEffect(() => {
     if (currentAct !== 5) return;
-    setWishSubmitted(false); setWish(""); setScreensaver(false);
     const timer = window.setTimeout(() => playCue("act5Close", 0.9), 650);
     return () => window.clearTimeout(timer);
   }, [currentAct, playCue]);
@@ -292,8 +279,6 @@ export default function Home() {
 
   const requestPlan = (nextGoal: string) => { const value = nextGoal.trim(); if (!value) return; setGoal(value); setPlan(makePlan(value)); };
   const launchFinale = () => { setWaterExit(true); window.setTimeout(() => goToAct(5), 920); };
-  const submitWish = () => { if (!wish.trim()) return; setWishSubmitted(true); window.setTimeout(() => setScreensaver(true), 950); };
-  const replay = () => { setBankClicks(0); setBalance("86,420.00"); setBankFeedback("所有资产仍由单一核心节点托管"); setIdentityName(""); setIdentityCode("访客#0000"); setPlan(null); idlePlayed.current = false; goToAct(1); };
 
   const timeline = useMemo(() => [1, 2, 3, 4, 5] as Act[], []);
   const caption = "当网络重构完成，去中心化来到最具体的日常生活中。";
@@ -331,8 +316,8 @@ export default function Home() {
         <section className="act4-scene future-scene" aria-labelledby="act-four-title"><div className="future-particle-wash" /><FutureTrace /><div className="future-inner"><p className="eyebrow">NO LOGIN · NO PLATFORM · ONE IDENTITY</p><h1 id="act-four-title">告诉我你的目标<br />为你生成专属学习路径</h1><p className="identity-path-note">身份不再请求中心。此路径只向你的节点确认。</p><div className="goal-input-row"><Input value={goal} onChange={event => setGoal(event.target.value)} placeholder="写入你的学习目标" /><Button onClick={() => requestPlan(goal)} aria-label="确认此目标"><Sparkles size={16} /></Button></div><div className="goal-chips">{["我要去英国留学", "我想看懂英文论文", "我要和外国客户开会"].map(item => <button key={item} className={goal === item ? "is-selected" : ""} onClick={() => requestPlan(item)}>{item}<ChevronRight size={14} /></button>)}</div>{plan && <div className="plan-card"><div><span>由 {identityCode} 确认</span><b>{plan.duration}</b></div><ol>{plan.stages.map((item, index) => <li key={item}><i>0{index + 1}</i>{item}</li>)}</ol><p><Sparkles size={15} />每日建议：{plan.tip}</p><Button onClick={launchFinale}><ArrowRight size={16} />开始我的学习</Button></div>}</div></section>
       </section>}
 
-      {currentAct === 5 && <section className={`act-panel act-five ${screensaver ? "is-screensaver" : ""}`} aria-labelledby="act-five-title" style={{ "--earth-scene": `url(${EARTH_SCENE})` } as CSSProperties}>
-        <div className="star-layer" aria-hidden="true">{Array.from({ length: 58 }, (_, index) => <i key={index} style={{ "--i": index } as CSSProperties} />)}</div><EarthNetwork screensaver={screensaver} /><div className="act-content final-layout"><ActCaption act={5} /><span className="eyebrow">OPEN HORIZON / {identityCode}</span><h1 id="act-five-title">时代褶皱</h1><p className="transition-complete">过渡已完成</p><p className="final-subtitle">但新世界的内容 · 等待你来填充</p><p className="final-footer">旧世界已经结束 · 新世界刚刚开始<br />我们不是在见证时代 · 我们正在编写它</p>{!wishSubmitted ? <div className="wish-form"><label htmlFor="creation-wish">你想在新世界中创造什么？</label><Textarea id="creation-wish" value={wish} onChange={event => setWish(event.target.value)} placeholder="你想在新世界中创造什么？" /><Button onClick={submitWish}><Send size={16} />记录我的愿景</Button></div> : <div className="wish-success"><span><Check size={17} />已记录 · 共建者 {identityCode.slice(-5)}</span><strong>{wish}</strong><p>{screensaver ? "愿景正在成为永恒星空的一部分。" : "正在将愿景写入新的连接……"}</p>{screensaver && <Button onClick={replay}><RefreshCw size={16} />重新体验</Button>}</div>}</div>
+      {currentAct === 5 && <section className="act-panel act-five" aria-label="过渡完成后的去中心化地球共建体验">
+        <p className="act-five-transition-marker">过渡已完成</p><OrbEarthExperience soundEnabled={soundEnabled} />
       </section>}
     </section>
     <nav className="act-timeline" aria-label="五幕叙事进度">{timeline.map(act => <div className={act === currentAct ? "is-current" : act < currentAct ? "is-past" : ""} key={act}><span>{String(act).padStart(2, "0")}</span><i /><small>{ACT_META[act].title}</small></div>)}</nav>
