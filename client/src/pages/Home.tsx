@@ -2,7 +2,7 @@
  * 时代褶皱设计规范：本页以“硬边旧终端逐层剥落，露出流动星海”为唯一叙事语言。
  * 所有关键动作均由用户点击、输入或右向拖动推进；共识青蓝只用于可前进的状态和节点连接。
  */
-import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type RefObject } from "react";
 import {
   AlertTriangle, ArrowRight, Check, ChevronRight, Clock3, KeyRound, Network,
   Play, RefreshCw, Send, Settings2, ShieldAlert, Sparkles, UserRound, Volume2,
@@ -86,9 +86,9 @@ function OldBankInterface({ failed }: { failed: boolean }) {
   </div>;
 }
 
-function LegacyShatterVideo({ soundEnabled, onComplete }: { soundEnabled: boolean; onComplete: () => void }) {
+function LegacyShatterVideo({ videoRef, onComplete }: { videoRef: RefObject<HTMLVideoElement | null>; onComplete: () => void }) {
   return <section id="scene-old-bank-shatter" className="shatter-scene video-shatter-scene" data-anchor="scene-old-bank-shatter" aria-label="旧银行界面从边缘碎裂成深空背景的动画">
-    <video className="act2-shatter-video" src={ACT2_LEGACY_SHATTER_VIDEO} autoPlay muted playsInline preload="auto" onEnded={onComplete} onError={() => window.setTimeout(onComplete, 10500)} />
+    <video ref={videoRef} className="act2-shatter-video" src={ACT2_LEGACY_SHATTER_VIDEO} autoPlay muted playsInline preload="auto" onEnded={onComplete} onError={() => window.setTimeout(onComplete, 10500)} />
   </section>;
 }
 
@@ -117,6 +117,7 @@ export default function Home() {
   const [currentAct, setCurrentAct] = useState<Act>(requestedAct);
   const [transitioning, setTransitioning] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(true);
+  const [videoAudioReady, setVideoAudioReady] = useState(false);
   const [bankClicks, setBankClicks] = useState(0);
   const [bankFeedback, setBankFeedback] = useState("所有资产仍由单一核心节点托管");
   const [balance, setBalance] = useState("86,420.00");
@@ -138,6 +139,7 @@ export default function Home() {
   const [loaded, setLoaded] = useState(false);
 
   const audioRefs = useRef<Partial<Record<AudioCue, HTMLAudioElement>>>({});
+  const act2ShatterVideoRef = useRef<HTMLVideoElement | null>(null);
   const act3TransitionVideoRef = useRef<HTMLVideoElement | null>(null);
   const act3VideoRef = useRef<HTMLVideoElement | null>(null);
   const act3BoostTimer = useRef<number | null>(null);
@@ -162,6 +164,7 @@ export default function Home() {
   }, []);
 
   useEffect(() => { const timer = window.setTimeout(() => setLoaded(true), 760); return () => window.clearTimeout(timer); }, []);
+  useEffect(() => { setVideoAudioReady(false); }, [currentAct]);
 
   useEffect(() => {
     if (currentAct !== 1 || bankClicks > 0 || idlePlayed.current) return;
@@ -183,8 +186,24 @@ export default function Home() {
     const evolutionVideo = act3VideoRef.current;
     if (evolutionVideo) { evolutionVideo.pause(); evolutionVideo.currentTime = 0; evolutionVideo.playbackRate = 1; }
     if (transitionVideo) { transitionVideo.currentTime = 0; transitionVideo.playbackRate = 1; void transitionVideo.play().catch(() => undefined); }
-    return () => { if (act3BoostTimer.current !== null) window.clearTimeout(act3BoostTimer.current); };
+    const enableVideoAudio = window.setTimeout(() => { if (soundEnabled) setVideoAudioReady(true); }, 160);
+    return () => { window.clearTimeout(enableVideoAudio); if (act3BoostTimer.current !== null) window.clearTimeout(act3BoostTimer.current); };
   }, [currentAct]);
+
+  useEffect(() => {
+    if (currentAct !== 2 || act2Mode !== "fragment" || !soundEnabled) return;
+    const enableVideoAudio = window.setTimeout(() => setVideoAudioReady(true), 160);
+    return () => window.clearTimeout(enableVideoAudio);
+  }, [act2Mode, currentAct, soundEnabled]);
+
+  useEffect(() => {
+    const videoTracks = [act2ShatterVideoRef.current, act3TransitionVideoRef.current, act3VideoRef.current];
+    videoTracks.forEach(video => {
+      if (!video) return;
+      video.muted = !soundEnabled || !videoAudioReady;
+      video.volume = video === act2ShatterVideoRef.current ? 0.66 : 0.58;
+    });
+  }, [act2Mode, act3Sequence, currentAct, soundEnabled, videoAudioReady]);
 
   const stageIndex = evolution < 34 ? 0 : evolution < 67 ? 1 : 2;
   useEffect(() => {
@@ -262,6 +281,7 @@ export default function Home() {
   const startEvolutionVideo = () => {
     const evolutionVideo = act3VideoRef.current;
     setAct3Sequence("evolution");
+    if (soundEnabled) setVideoAudioReady(true);
     if (evolutionVideo) { evolutionVideo.currentTime = 0; evolutionVideo.playbackRate = 1; void evolutionVideo.play().catch(() => undefined); }
   };
   const handlePointerMove = (x: number, width: number) => {
@@ -282,7 +302,7 @@ export default function Home() {
   return <main className={`experience-shell act-${currentAct} ${transitioning ? "is-transitioning" : ""}`}>
     {!loaded && <div className="loading-curtain" role="status"><img src={BRAND_MARK} alt="" /><strong>跨时代过渡</strong><span>正在校准叙事坐标</span></div>}
     <div className="ambient-noise" aria-hidden="true" />
-    <header className="global-header"><div className="brand-lockup"><img src={BRAND_MARK} alt="时代褶皱" /><div><strong>时代褶皱</strong><span>ARCHIVE 01 · 单点 / 分叉 / 网络迁徙</span></div></div><button className={`sound-toggle ${soundEnabled ? "" : "is-muted"}`} onClick={() => setSoundEnabled(value => !value)} aria-label={soundEnabled ? "关闭音效" : "开启音效"}>{soundEnabled ? <Volume2 size={15} /> : <VolumeX size={15} />}<span>{soundEnabled ? "音效开启" : "音效关闭"}</span></button></header>
+    <header className="global-header"><div className="brand-lockup"><img src={BRAND_MARK} alt="时代褶皱" /><div><strong>时代褶皱</strong><span>ARCHIVE 01 · 单点 / 分叉 / 网络迁徙</span></div></div><button className={`sound-toggle ${soundEnabled ? "" : "is-muted"}`} onClick={() => { setVideoAudioReady(true); setSoundEnabled(value => !value); }} aria-label={soundEnabled ? "关闭音效" : "开启音效"}>{soundEnabled ? <Volume2 size={15} /> : <VolumeX size={15} />}<span>{soundEnabled ? "音效开启" : "音效关闭"}</span></button></header>
 
     <section className="act-stage" aria-label={`${ACT_META[currentAct].title}互动场景`}>
       {currentAct === 1 && <section className="act-panel act-one" aria-labelledby="act-one-title" style={{ "--terminal-texture": `url(${TERMINAL_TEXTURE})` } as CSSProperties}>
@@ -296,7 +316,7 @@ export default function Home() {
           {act2Mode === "identity" && <div className="identity-panel"><div><span className="eyebrow"><KeyRound size={14} />IDENTITY CONFIRMATION</span><h2>请确认您的<br />数字身份</h2><p>姓名与随机四位数将构成一次性的识别码。</p><p className="identity-note">此身份用于映射旧世界资产记录 · 无需任何中心化机构认证。</p></div><div className="identity-form"><label htmlFor="identity-name">姓名 + 随机四位数</label><Input id="identity-name" value={identityName} onChange={event => setIdentityName(event.target.value)} placeholder="输入姓名" /><p>{identityError}</p><Button onClick={generateIdentity}><Sparkles size={16} />生成并确认密钥</Button></div></div>}
           {act2Mode === "dna" && <div className="act2-sequence-panel"><span className="eyebrow"><KeyRound size={14} />KEY ASSEMBLY</span><h2>密钥字符正在组合并固定</h2><strong className="mono">{identityCode}</strong><DnaKeyVisual /></div>}
           {act2Mode === "recovery" && <div className="act2-sequence-panel recovery-panel"><span className="eyebrow"><Sparkles size={14} />NETWORK MAPPING</span><div><h2>您的资产已通过去中心化网络映射完成</h2><p>这些资产不存储在任何单一机构中 · 它们存在于网络的每一个节点上。</p><b>总资产：86,420.00 信用单位</b></div><DigitalAssetBoard /></div>}
-          {act2Mode === "fragment" && <div className="act2-sequence-panel fragment-panel"><span className="eyebrow"><AlertTriangle size={14} />LEGACY DETACHMENT</span><h2>旧银行界面正在碎裂</h2><LegacyShatterVideo soundEnabled={soundEnabled} onComplete={() => setAct2Mode("node")} /></div>}
+          {act2Mode === "fragment" && <div className="act2-sequence-panel fragment-panel"><span className="eyebrow"><AlertTriangle size={14} />LEGACY DETACHMENT</span><h2>旧银行界面正在碎裂</h2><LegacyShatterVideo videoRef={act2ShatterVideoRef} onComplete={() => setAct2Mode("node")} /></div>}
           {act2Mode === "node" && <div className="node-panel"><Network size={36} /><span className="eyebrow">NODE ENTRY</span><h2>映射已完成。<br />你的节点，正在加入网络。</h2><Button onClick={() => goToAct(3)}><Network size={16} />启用自己的节点</Button></div>}
         </div>
       </section>}
