@@ -25,6 +25,7 @@ const PARTICLE_STORM = "/manus-storage/cross-era-particle-storm_a15e9244.jpg";
 const TERMINAL_TEXTURE = "/manus-storage/cross-era-damaged-terminal-texture_720e35ed.jpg";
 const EARTH_SCENE = "/manus-storage/cross-era-decentralized-earth_10b19834.jpg";
 const EARTH_DAY = "/manus-storage/earth-day-lowres_ebf2eeb9.jpg";
+const ACT1_LEGACY_BANK_IMAGE = "/manus-storage/act1-legacy-wealth-platform_f06fb989.jpg";
 const ACT3_EVOLUTION_VIDEO = "/manus-storage/act3-evolution-final-v3_19c729d4.mp4";
 const ACT3_TRANSITION_VIDEO = "/manus-storage/particle-transition-final_42cef813.mp4";
 
@@ -78,20 +79,9 @@ function ActCaption({ act }: { act: Act }) {
 }
 
 function OldBankInterface({ failed }: { failed: boolean }) {
-  const products = [
-    ["稳健增利 12M", "+3.82%", "运行中"],
-    ["人民币货币基金", "+1.65%", "待清算"],
-    ["环球优选组合", "+4.19%", "需确认"],
-  ];
   return <div className={`old-bank-interface ${failed ? "is-failing" : ""}`} data-anchor="ACT1_OLD_BANKING_UI" aria-label="旧世界财富管理界面">
-    <div className="old-browser-bar"><span className="browser-dots"><i /><i /><i /></span><span>secure.centralwealth.cn / dashboard</span><b>已认证</b></div>
-    <div className="old-bank-nav"><strong>联信财富</strong><span>资产总览</span><span>账户服务</span><span>安全中心</span><em>用户</em></div>
-    <div className="old-bank-body">
-      <p>尊敬的用户，您好</p>
-      <section className="old-balance-card"><span>总资产（CNY）</span><strong className="mono">86,420.00</strong><small>较昨日 + ¥ 127.30</small></section>
-      <div className="old-bank-columns"><section><h3>我的持仓</h3>{products.map(([name, rate, state]) => <div className="legacy-product" key={name}><span>{name}<small>{state}</small></span><b>{rate}</b></div>)}</section><section><h3>快捷服务</h3><div className="legacy-service-grid"><i>转</i><i>理</i><i>客</i><i>设</i></div><p className="legacy-tip">您的资产由中央账户统一托管</p></section></div>
-    </div>
-    {failed && <div className="red-data-stream" aria-hidden="true">00110　ERROR　01010　FUNDS　00011　DRAIN　11001　NODE</div>}
+    <img className="old-bank-source-image" src={ACT1_LEGACY_BANK_IMAGE} alt="2010年代财富管理平台的旧银行界面" />
+    {failed && <div className="old-bank-fault-overlay" aria-live="polite"><span>CORE NODE FAILURE</span><strong>资产状态：冻结</strong><i>00110　ERROR　01010　FUNDS　00011　DRAIN　11001　NODE</i></div>}
   </div>;
 }
 

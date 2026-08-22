@@ -89,6 +89,14 @@ h1,h2 { font-family:"Noto Serif SC",serif; }
 .network-field[data-sequence="evolution"] .network-transition { opacity:0; pointer-events:none; }
 .galaxy-transition { display:none !important; }
 
+/* 第一幕指定素材：保留完整旧平台构图；故障发生后才叠加赤色数据损坏层。 */
+.old-bank-interface { min-height:0; aspect-ratio:2048 / 1150; background:#0b171e; }
+.old-bank-source-image { display:block; width:100%; height:100%; object-fit:cover; object-position:center; }
+.old-bank-interface.is-failing .old-bank-source-image { filter:saturate(.62) contrast(1.08) brightness(.72); }
+.old-bank-fault-overlay { position:absolute; inset:0; display:flex; flex-direction:column; justify-content:flex-end; gap:7px; padding:18px; color:#ffd9dc; background:repeating-linear-gradient(180deg,rgba(255,50,70,.07) 0 3px,transparent 3px 7px),linear-gradient(180deg,transparent 38%,rgba(59,2,12,.71)); mix-blend-mode:screen; pointer-events:none; }
+.old-bank-fault-overlay span,.old-bank-fault-overlay i { font:9px "IBM Plex Mono",monospace; letter-spacing:.12em; }.old-bank-fault-overlay strong { color:#ff777f; font:600 21px "Noto Serif SC",serif; letter-spacing:.05em; }.old-bank-fault-overlay i { color:#ff9299; font-style:normal; white-space:nowrap; animation:data-drain 2.2s linear infinite; }
+@media (max-width:900px) { .old-bank-interface { aspect-ratio:2048 / 1150; min-height:0; } }
+
 /* 审阅收束：断层标记、旧结构残影和稀缺的共识青蓝，让五幕保持同一条剥离轨迹。 */
 .brand-lockup { position:relative; }
 .brand-lockup::before { content:""; position:absolute; left:2px; width:34px; height:34px; border:1px solid rgba(88,216,255,.82); border-radius:50%; box-shadow:inset 0 0 0 5px #07111e,inset 0 0 0 6px rgba(88,216,255,.46),0 0 13px rgba(88,216,255,.18); clip-path:polygon(0 0,100% 0,100% 44%,57% 47%,43% 58%,0 55%); transform:rotate(-22deg); pointer-events:none; }
