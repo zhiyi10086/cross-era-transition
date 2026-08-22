@@ -35,7 +35,6 @@ const AUDIO_SOURCES = {
   act1Explainer: "/manus-storage/act1-explainer-role-b_1721db81.wav",
   act1Idle: "/manus-storage/act1-idle-role-b_c2315e05.wav",
   act2Fade: "/manus-storage/act2-alert-fade_47714b4e.mp3",
-  act2Choice: "/manus-storage/act2-choice-role-b_f571d8d9.wav",
   act2Identity: "/manus-storage/act2-identity-role-a_39259159.wav",
   act2Submit: "/manus-storage/act2-identity-submit_29950067.mp3",
   act2Mapped: "/manus-storage/act2-asset-mapped_89b632a6.mp3",
@@ -183,8 +182,7 @@ export default function Home() {
     if (currentAct !== 2) return;
     setAct2Mode("choice"); setWaitSeconds(5); setIdentityError("");
     const fade = window.setTimeout(() => playCue("act2Fade", 0.45), 50);
-    const guide = window.setTimeout(() => playCue("act2Choice", 0.82), 760);
-    return () => { window.clearTimeout(fade); window.clearTimeout(guide); };
+    return () => { window.clearTimeout(fade); };
   }, [currentAct, playCue]);
 
   useEffect(() => {
