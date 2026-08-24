@@ -16,7 +16,7 @@ import { OrbEarthExperience } from "@/components/OrbEarthExperience";
 
 type Act = 1 | 2 | 3 | 4 | 5;
 type Act2Mode = "choice" | "waiting" | "identity" | "dna" | "recovery" | "fragment" | "node";
-type Act4Stage = "caption" | "caption-exit" | "crossfade" | "new";
+type Act4Stage = "caption-prep" | "caption" | "caption-exit" | "legacy" | "crossfade" | "new";
 type AudioCue = keyof typeof AUDIO_SOURCES;
 
 type LearningPlan = { duration: string; stages: string[]; tip: string };
@@ -26,6 +26,8 @@ const PARTICLE_STORM = "/manus-storage/cross-era-particle-storm_a15e9244.jpg";
 const TERMINAL_TEXTURE = "/manus-storage/cross-era-damaged-terminal-texture_720e35ed.jpg";
 const ACT1_LEGACY_BANK_IMAGE = "/manus-storage/act1-legacy-wealth-platform_f06fb989.jpg";
 const ACT2_LEGACY_SHATTER_VIDEO = "/manus-storage/act2-legacy-bank-shatter_8b931b8c.mp4";
+const ACT2_CHOICE_REFERENCE_IMAGE = "/manus-storage/act2-choice-reference_5205e74a.webp";
+const ACT2_CHOICE_REFERENCE_VIDEO = "/manus-storage/act2-choice-reference_b908f5e5.mp4";
 const ACT3_EVOLUTION_VIDEO = "/manus-storage/act3-evolution-final-v3_19c729d4.mp4";
 const ACT3_TRANSITION_VIDEO = "/manus-storage/particle-transition-final_42cef813.mp4";
 
@@ -120,7 +122,7 @@ export default function Home() {
   const [act3Sequence, setAct3Sequence] = useState<"galaxy" | "evolution">("galaxy");
   const [evolution, setEvolution] = useState(0);
   const [motionBoost, setMotionBoost] = useState(0);
-  const [act4Stage, setAct4Stage] = useState<Act4Stage>("caption");
+  const [act4Stage, setAct4Stage] = useState<Act4Stage>("caption-prep");
   const [goal, setGoal] = useState("");
   const [plan, setPlan] = useState<LearningPlan | null>(null);
   const [waterExit, setWaterExit] = useState(false);
@@ -201,11 +203,13 @@ export default function Home() {
   }, [act3Sequence, currentAct, playCue, stageIndex]);
   useEffect(() => {
     if (currentAct !== 4) return;
-    setAct4Stage("caption"); setWaterExit(false);
-    const exit = window.setTimeout(() => setAct4Stage("caption-exit"), 2250);
-    const cross = window.setTimeout(() => { setAct4Stage("crossfade"); playCue("act4Sweep", 0.8); }, 2900);
-    const fresh = window.setTimeout(() => { setAct4Stage("new"); playCue("act4Explain", 0.9); }, 4400);
-    return () => { window.clearTimeout(exit); window.clearTimeout(cross); window.clearTimeout(fresh); };
+    setAct4Stage("caption-prep"); setWaterExit(false);
+    const caption = window.setTimeout(() => setAct4Stage("caption"), 80);
+    const exit = window.setTimeout(() => setAct4Stage("caption-exit"), 15080);
+    const legacy = window.setTimeout(() => setAct4Stage("legacy"), 17080);
+    const cross = window.setTimeout(() => { setAct4Stage("crossfade"); playCue("act4Sweep", 0.8); }, 27080);
+    const fresh = window.setTimeout(() => { setAct4Stage("new"); playCue("act4Explain", 0.9); }, 28580);
+    return () => { window.clearTimeout(caption); window.clearTimeout(exit); window.clearTimeout(legacy); window.clearTimeout(cross); window.clearTimeout(fresh); };
   }, [currentAct, playCue]);
 
   useEffect(() => {
@@ -295,8 +299,8 @@ export default function Home() {
       </section>}
 
       {currentAct === 2 && <section className="act-panel act-two" aria-label="去中心化密钥选择与资产映射流程">
-        <div className="act-content choice-layout">
-          {act2Mode === "choice" && <><div className="choice-heading"><ActCaption act={2} /><p className="eyebrow">当中心不再可信 · 权力开始重新拓扑</p><h1>选择一条<br />不会消失的路径</h1><p>页面不替你做决定。你必须亲手选择下一步。</p></div><div className="choice-cards"><button className="choice-card legacy-choice" onClick={beginWaiting}><Clock3 /><span>等待中心恢复</span><small>中心化系统报错 · 预计恢复时间：未知</small><ChevronRight /></button><button className="choice-card key-choice" onClick={() => { setAct2Mode("identity"); playCue("act2Identity", 0.9); }}><KeyRound /><span>启用去中心化密钥</span><small>无需等待 · 即刻启动 · 数字身份 · 主权回归</small><ChevronRight /></button></div></>}
+        <div className={`act-content choice-layout is-${act2Mode}`}>
+          {act2Mode === "choice" && <section className="act2-choice-reference" aria-label="选择身份控制权的路由方式"><video className="act2-choice-reference-video" src={ACT2_CHOICE_REFERENCE_VIDEO} poster={ACT2_CHOICE_REFERENCE_IMAGE} autoPlay loop muted playsInline preload="auto" aria-hidden="true" /><div className="act2-choice-hit-zones"><button className="act2-choice-hit-zone legacy-hit-zone" type="button" onClick={beginWaiting} aria-label="等待中心恢复"><span className="sr-only">等待中心恢复</span></button><button className="act2-choice-hit-zone key-hit-zone" type="button" onClick={() => { setAct2Mode("identity"); playCue("act2Identity", 0.9); }} aria-label="启用去中心化密钥"><span className="sr-only">启用去中心化密钥</span></button></div></section>}
           {act2Mode === "waiting" && <div className="waiting-panel"><Clock3 size={42} /><div><strong>中心仍不可用</strong><p>恢复进度：未知。{waitSeconds} 秒后自动返回选择。</p></div><i><b style={{ width: `${(5 - waitSeconds) * 20}%` }} /></i></div>}
           {act2Mode === "identity" && <div className="identity-panel"><div><span className="eyebrow"><KeyRound size={14} />IDENTITY CONFIRMATION</span><h2>请确认您的<br />数字身份</h2><p>姓名与随机四位数将构成一次性的识别码。</p><p className="identity-note">此身份用于映射旧世界资产记录 · 无需任何中心化机构认证。</p></div><div className="identity-form"><label htmlFor="identity-name">姓名 + 随机四位数</label><Input id="identity-name" value={identityName} onChange={event => setIdentityName(event.target.value)} placeholder="输入姓名" /><p>{identityError}</p><Button onClick={generateIdentity}><Sparkles size={16} />生成并确认密钥</Button></div></div>}
           {act2Mode === "dna" && <div className="act2-sequence-panel"><span className="eyebrow"><KeyRound size={14} />KEY ASSEMBLY</span><h2>密钥字符正在组合并固定</h2><strong className="mono">{identityCode}</strong><DnaKeyVisual /></div>}

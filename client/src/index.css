@@ -120,6 +120,38 @@ h1,h2 { font-family:"Noto Serif SC",serif; }
 .video-shatter-scene { min-height:0; aspect-ratio:16 / 9; margin-top:24px; background:#020712; }
 .act2-shatter-video { display:block; width:100%; height:100%; object-fit:contain; background:#020712; }
 
+/* 第二幕指定录屏：背景和卡片完整交由原始成片呈现，透明命中区域保留既有选择逻辑。 */
+.act-two .choice-layout.is-choice { width:100%; max-width:none; min-height:100dvh; padding:0; display:block; }
+.act2-choice-reference { position:absolute; inset:0; overflow:hidden; background:#080a15 url("/manus-storage/act2-choice-reference_5205e74a.webp") center/cover; }
+.act2-choice-reference-video { display:block; width:100%; height:100%; object-fit:cover; object-position:center; }
+.act2-choice-reference::after { content:""; position:absolute; inset:0; pointer-events:none; background:linear-gradient(90deg,rgba(4,6,13,.08),transparent 38%,rgba(14,6,42,.04)),radial-gradient(ellipse at 50% 50%,transparent 45%,rgba(2,3,10,.22)); }
+.act2-choice-hit-zones { position:absolute; z-index:2; inset:0; }
+.act2-choice-hit-zone { position:absolute; top:50.8%; width:32%; height:35%; border:1px solid transparent; background:transparent; opacity:0; transition:opacity .18s ease,border-color .18s ease,box-shadow .18s ease; }
+.legacy-hit-zone { left:21.8%; }.key-hit-zone { left:53.9%; }
+.act2-choice-hit-zone:hover { opacity:1; background:rgba(158,207,255,.035); border-color:rgba(130,192,255,.48); box-shadow:inset 0 0 32px rgba(78,142,255,.14),0 0 25px rgba(71,104,255,.11); }
+.key-hit-zone:hover { border-color:rgba(158,116,255,.74); box-shadow:inset 0 0 36px rgba(101,70,255,.22),0 0 30px rgba(101,70,255,.22); }
+.act2-choice-hit-zone:focus-visible { opacity:1; outline:2px solid #84ddff; outline-offset:-4px; }
+.sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
+@media (max-width:900px) { .act2-choice-reference-video { object-position:50% 50%; }.act2-choice-hit-zone { top:46%; width:42%; height:41%; }.legacy-hit-zone { left:6%; }.key-hit-zone { left:52%; } }
+
+/* 第四幕重构：字幕必须先独立完成阅读时段，随后旧机构与右侧新界面才进入同一镜头。 */
+.act-four { background:linear-gradient(90deg,#222428 0 47.8%,#091a35 47.8% 100%); }
+.act-four::after { content:""; position:absolute; z-index:4; top:0; bottom:0; left:47.8%; width:1px; background:linear-gradient(180deg,transparent,rgba(138,229,231,.35) 18% 82%,transparent); opacity:0; transition:opacity 1.5s ease; }
+.act4-scene.legacy-scene { right:52.2%; left:0; background:#222428; transform:translateX(-2%); opacity:0; pointer-events:none; }
+.act4-scene.future-scene { right:0; left:47.8%; background:radial-gradient(circle at 75% 18%,rgba(98,244,231,.23),transparent 33%),linear-gradient(145deg,#0b2447,#14135b 68%,#13316d); transform:translateX(3%); opacity:0; pointer-events:none; }
+.act-four.is-caption-prep .act4-scene,.act-four.is-caption .act4-scene,.act-four.is-caption-exit .act4-scene { opacity:0; pointer-events:none; }
+.act-four.is-caption-prep .act4-caption-overlay { opacity:0; transition:opacity 15s cubic-bezier(.23,1,.32,1),transform 15s cubic-bezier(.23,1,.32,1); }
+.act-four.is-caption .act4-caption-overlay { opacity:1; transform:translate(-50%,-50%); transition:opacity 15s cubic-bezier(.23,1,.32,1),transform 15s cubic-bezier(.23,1,.32,1); }
+.act-four.is-caption .act4-caption-overlay p span { animation-duration:1.1s; animation-delay:calc(var(--character-index, 0) * 55ms); }
+.act-four.is-caption-exit .act4-caption-overlay { opacity:0; transform:translate(-50%,-58%); filter:blur(6px); transition:opacity 2s cubic-bezier(.23,1,.32,1),transform 2s cubic-bezier(.23,1,.32,1),filter 2s cubic-bezier(.23,1,.32,1); }
+.act-four.is-legacy .act4-caption-overlay,.act-four.is-crossfade .act4-caption-overlay,.act-four.is-new .act4-caption-overlay { opacity:0; pointer-events:none; }
+.act-four.is-legacy .legacy-scene { z-index:3; opacity:1; transform:none; pointer-events:auto; }
+.act-four.is-legacy::after,.act-four.is-crossfade::after,.act-four.is-new::after { opacity:1; }
+.act-four.is-crossfade .legacy-scene,.act-four.is-new .legacy-scene { z-index:2; opacity:0; transform:translateX(-5%); filter:grayscale(1) blur(5px); }
+.act-four.is-crossfade .future-scene,.act-four.is-new .future-scene { z-index:3; opacity:1; transform:none; }.act-four.is-new .future-scene { pointer-events:auto; }
+.act-four .legacy-training { width:100%; padding:117px clamp(24px,4vw,64px) 90px; }.act-four .future-inner { width:100%; margin:0; padding:104px clamp(24px,4vw,68px) 85px; }
+@media (max-width:900px) { .act-four { background:#0a0e16; }.act-four::after { display:none; }.act4-scene.legacy-scene,.act4-scene.future-scene { right:0; left:0; }.act-four .legacy-training,.act-four .future-inner { padding-left:22px; padding-right:22px; } }
+
 /* 审阅收束：断层标记、旧结构残影和稀缺的共识青蓝，让五幕保持同一条剥离轨迹。 */
 .brand-lockup { position:relative; }
 .brand-lockup::before { content:""; position:absolute; left:2px; width:34px; height:34px; border:1px solid rgba(88,216,255,.82); border-radius:50%; box-shadow:inset 0 0 0 5px #07111e,inset 0 0 0 6px rgba(88,216,255,.46),0 0 13px rgba(88,216,255,.18); clip-path:polygon(0 0,100% 0,100% 44%,57% 47%,43% 58%,0 55%); transform:rotate(-22deg); pointer-events:none; }
